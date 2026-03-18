@@ -30,7 +30,7 @@ export async function getNewsHeadlines(feedUrl: string, maxItems = 3): Promise<s
   try {
     const res = await fetch(feedUrl, { next: { revalidate: 300 } })
     const text = await res.text()
-    const titles = [...text.matchAll(/<title><!\[CDATA\[(.+?)\]\]><\/title>|<title>(.+?)<\/title>/g)]
+    const titles = Array.from(text.matchAll(/<title><!\[CDATA\[(.+?)\]\]><\/title>|<title>(.+?)<\/title>/g))
       .map(m => m[1] || m[2])
       .filter(t => t && !t.includes('http'))
       .slice(1, maxItems + 1) // skip channel title
