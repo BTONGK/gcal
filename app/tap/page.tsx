@@ -1,7 +1,4 @@
-import { notFound } from 'next/navigation'
 import { LOCATIONS } from '@/lib/locations'
-import { getWeather } from '@/lib/weather'
-import WeatherCard from '@/components/WeatherCard'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,27 +8,13 @@ interface PageProps {
 
 export default async function TapPage({ searchParams }: PageProps) {
   const loc = searchParams.loc
-  const sig = searchParams.sig
-
-  if (!loc || !LOCATIONS[loc]) notFound()
-
-  const location = LOCATIONS[loc]
-
-  let weather = null
-  let weatherError = false
-  try {
-    weather = await getWeather(location.lat, location.lon)
-  } catch {
-    weatherError = true
-  }
+  const locationKeys = Object.keys(LOCATIONS)
 
   return (
-    <WeatherCard
-      location={location}
-      weather={weather}
-      weatherError={weatherError}
-      loc={loc}
-      sig={sig}
-    />
+    <div style={{ padding: 40, fontFamily: 'monospace', background: '#000', color: '#fff', minHeight: '100vh' }}>
+      <p>loc param: {loc ?? 'undefined'}</p>
+      <p>available keys: {locationKeys.join(', ')}</p>
+      <p>match: {loc ? String(!!LOCATIONS[loc]) : 'no loc'}</p>
+    </div>
   )
 }
