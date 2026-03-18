@@ -1,25 +1,21 @@
 import { notFound } from 'next/navigation'
 import { LOCATIONS } from '@/lib/locations'
-import { verifyLocation } from '@/lib/signing'
 import { getWeather } from '@/lib/weather'
 import WeatherCard from '@/components/WeatherCard'
+
+export const dynamic = 'force-dynamic'
 
 interface PageProps {
   searchParams: { loc?: string; sig?: string }
 }
 
 export default async function TapPage({ searchParams }: PageProps) {
-  const { loc, sig } = searchParams
+  const loc = searchParams.loc
+  const sig = searchParams.sig
 
-  console.log('[tap] loc:', loc, 'sig:', sig)
-  console.log('[tap] available locations:', Object.keys(LOCATIONS))
-
-  // Skip sig check for now — re-enable for production hardening
-  if (!loc) notFound()
+  if (!loc || !LOCATIONS[loc]) notFound()
 
   const location = LOCATIONS[loc]
-  console.log('[tap] resolved location:', location)
-  if (!location) notFound()
 
   let weather = null
   let weatherError = false
