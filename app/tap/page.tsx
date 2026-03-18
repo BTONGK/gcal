@@ -11,10 +11,14 @@ interface PageProps {
 export default async function TapPage({ searchParams }: PageProps) {
   const { loc, sig } = searchParams
 
+  console.log('[tap] loc:', loc, 'sig:', sig)
+  console.log('[tap] available locations:', Object.keys(LOCATIONS))
+
   // Skip sig check for now — re-enable for production hardening
   if (!loc) notFound()
 
   const location = LOCATIONS[loc]
+  console.log('[tap] resolved location:', location)
   if (!location) notFound()
 
   let weather = null
