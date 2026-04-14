@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 type MeetResult =
   | { found: true; meetLink: string; title: string; start: string }
   | { found: false }
 
-export default function MeetPage() {
+function MeetInner() {
   const searchParams = useSearchParams()
   const sig = searchParams.get('sig')
   const [status, setStatus] = useState<'loading' | 'joining' | 'none' | 'error'>('loading')
@@ -67,5 +67,13 @@ export default function MeetPage() {
         </>
       )}
     </main>
+  )
+}
+
+export default function MeetPage() {
+  return (
+    <Suspense>
+      <MeetInner />
+    </Suspense>
   )
 }
