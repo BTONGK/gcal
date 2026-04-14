@@ -23,6 +23,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
   }
 
+  if (!process.env.GOOGLE_REFRESH_TOKEN) {
+    return NextResponse.json({ error: 'GOOGLE_REFRESH_TOKEN not set in environment' }, { status: 500 })
+  }
+
   const auth = getOAuthClient()
   const calendar = google.calendar({ version: 'v3', auth })
 
@@ -31,13 +35,19 @@ export async function GET(request: Request) {
   const windowStart = new Date(now.getTime() - 5 * 60 * 1000)   // 5 min ago
   const windowEnd = new Date(now.getTime() + 30 * 60 * 1000)    // 30 min from now
 
-  const res = await calendar.events.list({
-    calendarId: 'primary',
-    timeMin: windowStart.toISOString(),
-    timeMax: windowEnd.toISOString(),
-    singleEvents: true,
-    orderBy: 'startTime',
-  })
+  let res
+  try {
+    res = await calendar.events.list({
+      calendarId: 'primary',
+      timeMin: windowStart.toISOString(),
+      timeMax: windowEnd.toISOString(),
+      singleEvents: true,
+      orderBy: 'startTime',
+    })
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: 'Google Calendar API error', detail: msg }, { status: 500 })
+  }
 
   const events = res.data.items ?? []
 
