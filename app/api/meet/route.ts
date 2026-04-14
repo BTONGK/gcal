@@ -15,6 +15,7 @@ function getOAuthClient() {
 }
 
 export async function GET(request: Request) {
+  try {
   const { searchParams } = new URL(request.url)
   const sig = searchParams.get('sig')
 
@@ -85,4 +86,8 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({ found: false })
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: 'Unhandled error', detail: msg }, { status: 500 })
+  }
 }
